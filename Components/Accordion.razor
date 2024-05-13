@@ -1,0 +1,27 @@
+﻿
+<section class="accordion">
+    <div class="accordion-header flex items-center justify-between">
+        @AccordionHeader
+    </div>
+
+
+    @if (Visible)
+    {
+        <div class="accordion-body-panel">
+            @AccordionContent
+        </div>
+    }
+
+</section>
+
+@code {
+
+    [Parameter]
+    public bool Visible { get; set; }
+
+    [Parameter]
+    public RenderFragment? AccordionHeader { get; set; }
+
+    [Parameter]
+    public RenderFragment? AccordionContent { get; set; }
+}

@@ -1,0 +1,208 @@
+﻿<div class="border" style="display:grid;">
+
+    @sections?.Count
+    <SortableList Id="section"
+                  Group="sharedLists2"
+                  Handle=".drag-handle-section"
+                  Items="sections" Context="section"
+                  OnUpdate="@SortListSection">
+        <SortableItemTemplate>
+            <div id="@(section.Id)">
+            <Accordion Visible="section.IsVisible">
+                <AccordionHeader>
+                    <div class="flex gap-4 items-center bg-slate-100 w-full p-3 rounded border-b">
+                        <button class="icon h-7 w-7 aspect-square flex items-center justify-center rounded-full !border bg-[#0660A5] text-white border-[#0660A5] @(section.IsVisible ? "rotate-180" : "") transition-all ease-in-out duration-300"
+                                type="button" @onclick="(args) => { section.IsVisible = !section.IsVisible; }">
+                            <ChevronDown />
+                        </button>
+
+                        <div class="drag-handle-section h-8 w-8 aspect-square flex items-center justify-center rounded-full hover:bg-slate-200">
+                            <GripVerticle />
+                        </div>
+                        <p>@(section?.SecName)</p>
+                    </div>
+                </AccordionHeader>
+
+                <AccordionContent>
+                    <SortableList Id="@(section.guId)"
+                                  Group="sharedLists"
+                                  Handle=".drag-handle"
+                                  Items="section.Items" Context="item"
+                                  OnRemove="(indices) => ListRemove(section.guId, indices)"
+                                  OnUpdate="(indices) => SortList(section.Id, indices)">
+
+                        <SortableItemTemplate>
+                            <div id="@item.guId" class="flex gap-4 items-center p-2 bg-white">
+                                <div class="drag-handle h-8 w-8 aspect-square flex items-center justify-center rounded-full hover:bg-slate-200">
+                                    <GripVerticle />
+                                </div>
+                                <div class="w-full">
+                                    <p class=""> <h4>@item?.Name</h4></p>
+                                </div>
+                            </div>
+                        </SortableItemTemplate>
+                    </SortableList>
+                </AccordionContent>
+
+                </Accordion>
+            </div>
+        </SortableItemTemplate>
+    </SortableList>
+
+
+</div>
+
+@code {
+
+    public class Section
+    {
+        public string guId { get; set; } = Guid.NewGuid().ToString();
+        public int Id { get; set; }
+        public string SecName { get; set; }
+        public bool IsVisible = true;
+        public List<Item> Items { get; set; } = new List<Item>();
+    }
+
+    public class Item
+    {
+        public int Id { get; set; }
+        public string guId { get; set; } = Guid.NewGuid().ToString();
+        public int NewIndex { get; set; }
+        public string Name { get; set; }
+    }
+
+    List<Section> sections = new List<Section>
+    {
+        new Section
+        {
+            Id = 1,
+            SecName = "Section 1",
+            Items = new List<Item>
+            {
+                new Item { Id = 1, NewIndex = 1, Name = "Item 1" },
+                new Item { Id = 2, NewIndex = 2, Name = "Item 2" },
+                new Item { Id = 3, NewIndex = 3, Name = "Item 3" }
+            }
+        },
+        new Section
+        {
+            Id = 2,
+            SecName = "Section 2",
+            Items = new List<Item>
+            {
+                new Item { Id = 4, NewIndex = 1, Name = "Item 4" },
+                new Item { Id = 5, NewIndex = 2, Name = "Item 5" }
+            }
+        },
+        new Section
+        {
+            Id = 3,
+            SecName = "Section 3",
+            Items = new List<Item>
+            {
+                new Item { Id = 6, NewIndex = 1, Name = "Item 6" },
+                new Item { Id = 7, NewIndex = 2, Name = "Item 7" },
+                new Item { Id = 8, NewIndex = 3, Name = "Item 8" }
+            }
+        },
+        new Section
+        {
+            Id = 4,
+            SecName = "Section 4",
+            Items = new List<Item>
+            {
+                new Item { Id = 9, NewIndex = 1, Name = "Item 9" },
+                new Item { Id = 10, NewIndex = 2, Name = "Item 10" }
+            }
+        }
+    };
+
+    private void ListRemove(string id, (int oldIndex, int newIndex, string itemId, string targetId, string sourceId) item)
+    {
+
+        var targetSection = sections.Find(section => section.guId == item.targetId);
+
+        // Find the source section
+        var sourceSection = sections.Find(section => section.guId == item.sourceId);
+        if (sourceSection != null)
+        {
+            var oldList = sourceSection.Items;
+            var currItem = oldList[item.oldIndex];
+
+            // Add the item to the target list
+            var list = targetSection?.Items;
+            list.Insert(item.newIndex, currItem);
+
+            // Remove the item from the source list
+            var removeItem = oldList?.Find(i => i.guId == item.itemId);
+            oldList.Remove(removeItem);
+
+            // Update the indices in the source and target lists
+            UpdateNewIndex(oldList);
+            UpdateNewIndex(list);
+        }
+
+        // var dataJson = System.Text.Json.JsonSerializer.Serialize(sections);
+        // Console.WriteLine($"TransformedData: {dataJson}");
+    }
+
+
+    private void SortList(int id, (int oldIndex, int newIndex) indices)
+    {
+
+        var (oldIndex, newIndex) = indices;
+        var items = sections.Find(section => section.Id == id).Items;
+
+        var itemToMove = items[oldIndex];
+        items.RemoveAt(oldIndex);
+
+        if (newIndex < items?.Count)
+        {
+            items.Insert(newIndex, itemToMove);
+        }
+        else
+        {
+            items.Add(itemToMove);
+        }
+
+        UpdateNewIndex(items);
+    }
+
+    private void UpdateNewIndex(List<Item> items)
+    {
+        for (int i = 0; i < items.Count; i++)
+        {
+            items[i].NewIndex = i + 1;
+        }
+
+        StateHasChanged();
+    }
+
+
+    private void SortListSection((int oldIndex, int newIndex) indices)
+    {
+        // deconstruct the tuple
+        var (oldIndex, newIndex) = indices;
+
+        var items = this.sections;
+        var itemToMove = items[oldIndex];
+        sections.RemoveAt(oldIndex);
+
+        if (newIndex < sections.Count)
+        {
+            sections.Insert(newIndex, itemToMove);
+        }
+        else
+        {
+            sections.Add(itemToMove);
+        }
+
+        StateHasChanged();
+    }
+}
+
+<style>
+    .drag-handle {
+        cursor: grab;
+    }
+</style>

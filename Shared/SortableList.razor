@@ -1,0 +1,96 @@
+﻿@using System.Collections.Generic
+@using System.Diagnostics.CodeAnalysis
+
+@inject IJSRuntime JS
+
+@typeparam T
+
+<div id="@Id" class="divide-y">
+    @if (Items?.Count > 0)
+    {
+        @foreach (var item in Items)
+        {
+            @if (SortableItemTemplate is not null)
+            {
+                @SortableItemTemplate(item)
+            }
+        }
+
+    }
+    else
+    {
+        <p class="p-2">No item is in the list!</p>
+    }
+
+</div>
+
+@code {
+
+    [Parameter]
+    public RenderFragment<T>? SortableItemTemplate { get; set; }
+
+    [Parameter, AllowNull]
+    public List<T> Items { get; set; }
+
+    [Parameter]
+    public EventCallback<(int oldIndex, int newIndex)> OnUpdate { get; set; }
+
+    [Parameter]
+    public EventCallback<(int oldIndex, int newIndex, string itemId, string targetId, string sourceId)> OnRemove { get; set; }
+
+    [Parameter]
+    public string Id { get; set; } = Guid.NewGuid().ToString();
+
+    [Parameter]
+    public string Group { get; set; } = Guid.NewGuid().ToString();
+
+    [Parameter]
+    public string? Pull { get; set; }
+
+    [Parameter]
+    public bool Put { get; set; } = true;
+
+    [Parameter]
+    public bool Sort { get; set; } = true;
+
+    [Parameter]
+    public string Handle { get; set; } = string.Empty;
+
+    [Parameter]
+    public string? Filter { get; set; }
+
+    [Parameter]
+    public bool ForceFallback { get; set; } = true;
+
+    private DotNetObjectReference<SortableList<T>>? selfReference;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            selfReference = DotNetObjectReference.Create(this);
+            var module = await JS.InvokeAsync<IJSObjectReference>("import", "./Shared/SortableList.razor.js");
+            await module.InvokeAsync<string>("init", Id, Group, Pull, Put, Sort, Handle, Filter, selfReference, ForceFallback);
+        }
+    }
+
+    [JSInvokable]
+    public async Task OnUpdateJS(int oldIndex, int newIndex)
+    {
+        // invoke the OnUpdate event passing in the oldIndex and the newIndex
+        await OnUpdate.InvokeAsync((oldIndex, newIndex));
+    }
+
+    [JSInvokable]
+    public async Task OnRemoveJS(int oldIndex, int newIndex, string itemId, string targetId, string sourceId)
+    {
+        Console.WriteLine($"new {oldIndex}");
+        Console.WriteLine($"new2 {newIndex}");
+        // remove the item from the list
+        await OnRemove.InvokeAsync((oldIndex, newIndex, itemId, targetId, sourceId));
+    }
+
+    public void Dispose() => selfReference?.Dispose();
+
+
+}
