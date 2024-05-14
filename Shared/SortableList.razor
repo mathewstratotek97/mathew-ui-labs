@@ -69,7 +69,7 @@
         if (firstRender)
         {
             selfReference = DotNetObjectReference.Create(this);
-            var module = await JS.InvokeAsync<IJSObjectReference>("import", "./Shared/SortableList.razor.js");
+            var module = await JS.InvokeAsync<IJSObjectReference>("import", "./SortableList.js");
             await module.InvokeAsync<string>("init", Id, Group, Pull, Put, Sort, Handle, Filter, selfReference, ForceFallback);
         }
     }
@@ -84,8 +84,6 @@
     [JSInvokable]
     public async Task OnRemoveJS(int oldIndex, int newIndex, string itemId, string targetId, string sourceId)
     {
-        Console.WriteLine($"new {oldIndex}");
-        Console.WriteLine($"new2 {newIndex}");
         // remove the item from the list
         await OnRemove.InvokeAsync((oldIndex, newIndex, itemId, targetId, sourceId));
     }

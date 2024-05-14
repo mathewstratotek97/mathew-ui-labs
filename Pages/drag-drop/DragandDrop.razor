@@ -1,6 +1,5 @@
 ﻿<div class="border" style="display:grid;">
 
-    @sections?.Count
     <SortableList Id="section"
                   Group="sharedLists2"
                   Handle=".drag-handle-section"
@@ -196,6 +195,9 @@
         {
             sections.Add(itemToMove);
         }
+
+        var dataJson = System.Text.Json.JsonSerializer.Serialize(sections);
+        Console.WriteLine($"TransformedData: {dataJson}");
 
         StateHasChanged();
     }
