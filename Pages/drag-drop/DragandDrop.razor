@@ -120,37 +120,32 @@
 
     private void ListRemove(string id, (int oldIndex, int newIndex, string itemId, string targetId, string sourceId) item)
     {
-
         int oldIndex = item.oldIndex;
         int newIndex = item.newIndex;
         string itemId = item.itemId;
         string targetId = item.targetId;
         string sourceId = item.sourceId;
 
-        var targetSection = sections.Find(section => section.guId == item.targetId);
+        var targetSection = sections.FirstOrDefault(section => section.guId == targetId);
+        var sourceSection = sections.FirstOrDefault(section => section.guId == sourceId);
 
-        // Find the source section
-        var sourceSection = sections.Find(section => section.guId == item.sourceId);
-        if (sourceSection != null)
+        if (sourceSection != null && targetSection != null)
         {
             var oldList = sourceSection.Items;
-            var currItem = oldList[item.oldIndex];
+            var currItem = oldList[oldIndex];
 
-            // Add the item to the target list
-            var list = targetSection?.Items;
-            list.Insert(item.newIndex, currItem);
+            var list = targetSection.Items;
+            list.Insert(newIndex, currItem);
 
-            // Remove the item from the source list
-            var removeItem = oldList?.Find(i => i.guId == item.itemId);
-            oldList.Remove(removeItem);
+            var removeItem = oldList.FirstOrDefault(i => i.guId == itemId);
+            if (removeItem != null)
+            {
+                oldList.Remove(removeItem);
+                UpdateNewIndex(oldList);
+            }
 
-            // Update the indices in the source and target lists
-            UpdateNewIndex(oldList);
             UpdateNewIndex(list);
         }
-
-        // var dataJson = System.Text.Json.JsonSerializer.Serialize(sections);
-        // Console.WriteLine($"TransformedData: {dataJson}");
     }
 
 
