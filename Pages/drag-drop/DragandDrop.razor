@@ -121,6 +121,12 @@
     private void ListRemove(string id, (int oldIndex, int newIndex, string itemId, string targetId, string sourceId) item)
     {
 
+        int oldIndex = item.oldIndex;
+        int newIndex = item.newIndex;
+        string itemId = item.itemId;
+        string targetId = item.targetId;
+        string sourceId = item.sourceId;
+
         var targetSection = sections.Find(section => section.guId == item.targetId);
 
         // Find the source section
