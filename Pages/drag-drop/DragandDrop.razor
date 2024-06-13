@@ -68,7 +68,7 @@
     {
         public int Id { get; set; }
         public string guId { get; set; } = Guid.NewGuid().ToString();
-        public int NewIndex { get; set; }
+        public int myInd { get; set; }
         public string Name { get; set; }
     }
 
@@ -80,9 +80,9 @@
             SecName = "Section 1",
             Items = new List<Item>
             {
-                new Item { Id = 1, NewIndex = 1, Name = "Item 1" },
-                new Item { Id = 2, NewIndex = 2, Name = "Item 2" },
-                new Item { Id = 3, NewIndex = 3, Name = "Item 3" }
+                new Item { Id = 1, myInd = 1, Name = "Item 1" },
+                new Item { Id = 2, myInd = 2, Name = "Item 2" },
+                new Item { Id = 3, myInd = 3, Name = "Item 3" }
             }
         },
         new Section
@@ -91,8 +91,8 @@
             SecName = "Section 2",
             Items = new List<Item>
             {
-                new Item { Id = 4, NewIndex = 1, Name = "Item 4" },
-                new Item { Id = 5, NewIndex = 2, Name = "Item 5" }
+                new Item { Id = 4, myInd = 1, Name = "Item 4" },
+                new Item { Id = 5, myInd = 2, Name = "Item 5" }
             }
         },
         new Section
@@ -101,9 +101,9 @@
             SecName = "Section 3",
             Items = new List<Item>
             {
-                new Item { Id = 6, NewIndex = 1, Name = "Item 6" },
-                new Item { Id = 7, NewIndex = 2, Name = "Item 7" },
-                new Item { Id = 8, NewIndex = 3, Name = "Item 8" }
+                new Item { Id = 6, myInd = 1, Name = "Item 6" },
+                new Item { Id = 7, myInd = 2, Name = "Item 7" },
+                new Item { Id = 8, myInd = 3, Name = "Item 8" }
             }
         },
         new Section
@@ -112,8 +112,8 @@
             SecName = "Section 4",
             Items = new List<Item>
             {
-                new Item { Id = 9, NewIndex = 1, Name = "Item 9" },
-                new Item { Id = 10, NewIndex = 2, Name = "Item 10" }
+                new Item { Id = 9, myInd = 1, Name = "Item 9" },
+                new Item { Id = 10, myInd = 2, Name = "Item 10" }
             }
         }
     };
@@ -174,7 +174,7 @@
     {
         for (int i = 0; i < items.Count; i++)
         {
-            items[i].NewIndex = i + 1;
+            items[i].myInd = i + 1;
         }
 
         StateHasChanged();
