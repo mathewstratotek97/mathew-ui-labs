@@ -1,6 +1,7 @@
 ﻿@using System.Collections.Generic
 @using System.Diagnostics.CodeAnalysis
 @using System;
+@using Microsoft.AspNetCore.Components;
 
 @inject IJSRuntime JS
 
@@ -34,10 +35,10 @@
     public List<T> Items { get; set; }
 
     [Parameter]
-    public EventCallback<(int oldIndexer1, int newIndexer1)> OnUpdate { get; set; }
+    public EventCallback<(int oldIndex, int newIndex)> OnUpdate { get; set; }
 
     [Parameter]
-    public EventCallback<(int oldIndexer, int newIndexer, string itemId, string targetId, string sourceId)> OnRemove { get; set; }
+    public EventCallback<(int oldIndex, int newIndex, string itemId, string targetId, string sourceId)> OnRemove { get; set; }
 
     [Parameter]
     public string Id { get; set; } = Guid.NewGuid().ToString();

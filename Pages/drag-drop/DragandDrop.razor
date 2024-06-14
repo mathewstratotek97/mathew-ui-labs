@@ -1,6 +1,6 @@
 ﻿@using System;
 
-<div class="border" style="display:grid;user-select:none;">
+<div class="border" style="display:grid;">
 
     <SortableList Id="section"
                   Group="sharedLists2"
@@ -118,7 +118,7 @@
         }
     };
 
-    private void ListRemove(string id, (int oldIn, int newIn, string itemId, string targetId, string sourceId) item)
+    private void ListRemove(string id, (int oldIndex, int newIndex, string itemId, string targetId, string sourceId) item)
     {
         var targetSection = sections.Find(section => section.guId == item.targetId);
 
@@ -127,11 +127,11 @@
         if (sourceSection != null)
         {
             var oldList = sourceSection.Items;
-            var currItem = oldList[item.oldIn];
+            var currItem = oldList[item.oldIndex];
 
             // Add the item to the target list
             var list = targetSection?.Items;
-            list.Insert(item.newIn, currItem);
+            list.Insert(item.newIndex, currItem);
 
             // Remove the item from the source list
             var removeItem = oldList?.Find(i => i.guId == item.itemId);
@@ -144,7 +144,7 @@
     }
 
 
-    private void SortList(int id, (int oldIn2, int newIn2) indices)
+    private void SortList(int id, (int oldIndex, int newIndex) indices)
     {
 
         var (oldIndex, newIndex) = indices;
@@ -176,7 +176,7 @@
     }
 
 
-    private void SortListSection((int oldIn3, int newIn3) indices)
+    private void SortListSection((int oldIndex, int newIndex) indices)
     {
         // deconstruct the tuple
         var (oldIndex, newIndex) = indices;
